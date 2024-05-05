@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-
-
 import 'package:percent_indicator/percent_indicator.dart';
 
 class ResultPage extends StatelessWidget {
@@ -110,12 +108,12 @@ class ResultPage extends StatelessWidget {
             Row(children: [
               SizedBox(width: 45,),
               ElevatedButton(onPressed: (){}, 
-                 style:ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(246, 13, 21, 238)),
-                 child: const Text("Share",style: TextStyle(color: Colors.white),)),
+                style:ElevatedButton.styleFrom(backgroundColor: Colors.blue[900],foregroundColor: Colors.white),
+                 child: const Text("Share",)),
               SizedBox(width: 20,),
               ElevatedButton(onPressed: (){}, 
-                 style:ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(246, 13, 21, 238)),
-                 child: Text("Generate Report",style: TextStyle(color: Colors.white)))
+                 style:ElevatedButton.styleFrom(backgroundColor: Colors.blue[900],foregroundColor: Colors.white),
+                 child: Text("Generate Report"))
             ],)
           ],
         ),

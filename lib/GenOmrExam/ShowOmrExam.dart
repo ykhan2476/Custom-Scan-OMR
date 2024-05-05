@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:omr_reader/GenOmrExam/generateAnsKey.dart';
 
@@ -177,11 +176,14 @@ class _ShowOmrExamState extends State<ShowOmrExam> {
                   ],
                 ),
               ElevatedButton(onPressed: (){
+                
                 submittedOptions = List.from(selectedOptions);
                 print(submittedOptions);
                 Navigator.push(context,MaterialPageRoute(builder: (context) => 
                 generateAnsKey(submittedOptions: submittedOptions, totalSections2: sections, questionsInSection2: questions, totalmcq: widget.totalmcq, details:details,)));
-              }, child: Text('SUBMIT'))])),
+              },
+              style:ElevatedButton.styleFrom(backgroundColor: Colors.blue[900],foregroundColor: Colors.white), 
+              child: Text('SUBMIT'))])),
             ],
           ),
         ),

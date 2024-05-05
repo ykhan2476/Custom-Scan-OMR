@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:omr_reader/GenOmrExam/GenerateOmrExam.dart';
-import 'package:omr_reader/GenOmrExam/ShowOmrExam.dart';
-import 'package:omr_reader/home.dart';
-import 'package:omr_reader/ScanOmr/pickimage.dart';
-import 'package:uni_links/uni_links.dart';
-import 'package:flutter/services.dart' show PlatformException, MethodChannel;
-import 'package:flython/flython.dart';
+import 'package:omr_reader/widget/animation.dart';
+
 
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +23,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:home(),
+      home:animation(),
     );
   }
 }

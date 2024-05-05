@@ -41,6 +41,7 @@ class _CreateOmrPdfState extends State<CreateOmrPdf> {
   omrHeader head =omrHeader();
   omrRange80 sheet= omrRange80();
   omrRangenew sheetnew= omrRangenew();
+  int totalmcq =4;
   //omrRange120 sheet1= omrRange120();
   //omrRange160 sheet2=omrRange160();
   //omrRange225 sheet3= omrRange225();
@@ -115,6 +116,15 @@ class _CreateOmrPdfState extends State<CreateOmrPdf> {
                     validator: (value) {if (value!.isEmpty) {return 'Please enter Name';}return null;},),
                   TextFormField(controller: _classNameController,decoration: InputDecoration(labelText: 'Class'),),
                   Row(children: [ 
+                    SizedBox(child: Text('total mcqs in question'),),
+                    SizedBox(width: 5,),
+                    DropdownButton<int>(value: totalmcq,
+                       onChanged: (int? newValue) {
+                                  setState(() {totalmcq = newValue!;});},
+                     items: <int>[4,5].map<DropdownMenuItem<int>>((int value) {
+                    return DropdownMenuItem<int>(value: value,child: Text('        $value'),);}).toList(),hint: Text('Select a set'), ),
+                    ],),
+                  Row(children: [ 
                     SizedBox(child: Text('Select Set'),),
                     SizedBox(width: 60,),
                     DropdownButton<String>(value: _selectedSet,
@@ -171,8 +181,8 @@ class _CreateOmrPdfState extends State<CreateOmrPdf> {
                       onPressed: () async {
                         submit_details(fname,lname,hght,wid,capitalLetters) ;
                       },
-                 style:ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(246, 13, 21, 238)),
-                 child: const Text("Create Omr Sheet",style: TextStyle(color: Colors.white),)
+                 style:ElevatedButton.styleFrom(backgroundColor: Colors.blue[900],foregroundColor: Colors.white),
+                 child: const Text("Create Omr Sheet")
                     ),
                   ),)
                 ],
@@ -190,26 +200,35 @@ submit_details(fname,lname,hght,wid,capitalLetters) async{
    List<pw.Image> ArucoImages = [];
   List<pw.Image> ArucoImages2 = [];
   List<pw.Image> ArucoImages3 = [];
+  List<pw.Image> ArucoImages4 = [];
    for (int i = 0; i < 4; i++) {
               
     final img = await rootBundle.load('assets/DICT/$i.png');
     final img2 = await rootBundle.load('assets/DICT/${i+4}.png');
     final img3 = await rootBundle.load('assets/DICT/${i+8}.png');
+    final img4 = await rootBundle.load('assets/DICT/${i+12}.png');
     final imageBytes = img.buffer.asUint8List(); 
     final imageBytes2 = img2.buffer.asUint8List(); 
     final imageBytes3 = img3.buffer.asUint8List(); 
+    final imageBytes4 = img4.buffer.asUint8List(); 
     pw.Image image1 = pw.Image(pw.MemoryImage(imageBytes));
     pw.Image image2 = pw.Image(pw.MemoryImage(imageBytes2));
     pw.Image image3 = pw.Image(pw.MemoryImage(imageBytes3));
+    pw.Image image4 = pw.Image(pw.MemoryImage(imageBytes4));
     ArucoImages.add(image1);
     ArucoImages2.add(image2);
     ArucoImages3.add(image3);
+    ArucoImages4.add(image4);
     } 
      if (_formKey.currentState!.validate()) {
       int totalQuestions = questionsInSection.reduce((value, element) => value + element);
-      if(totalQuestions>424){
+      if(totalQuestions>400){
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:
-                Text('Total questions exceed 424. Please reduce the number of questions.'),),);
+                Text('Total questions exceed 400. Please reduce the number of questions.'),),);
+      }
+      if(_RollNoController.text.length>9){
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:
+                Text('Roll Number exceeds more than 9 digits '),),);
       }else{
         List<String> rollno = _RollNoController.text.split("");
         List<String> fullname =[];
@@ -246,24 +265,24 @@ submit_details(fname,lname,hght,wid,capitalLetters) async{
                   print('Total Questions: $totalQuestions');
                   print(questionsInSection);
                   final pdf = pw.Document();
-                  if(totalQuestions<=80){
+                  if(totalQuestions<=56){
                     pdf.addPage(pw.Page(pageTheme: pw.PageTheme( pageFormat:PdfPageFormat.a3.copyWith(
                       marginBottom: 15,marginLeft: 15,marginRight: 15,marginTop: 15,),orientation: pw.PageOrientation.portrait,)
                       ,build: (pw.Context context) { 
-                        return pw.Center(child:_content(context,hght,wid,optionslist,capitalLetters,totalQuestions,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages));},));
+                        return pw.Center(child:_content(context,hght,wid,optionslist,capitalLetters,totalQuestions,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages,ArucoImages4,totalmcq));},));
                     final data = await pdfgenerate.genpdf(pdf);
                     pdfgenerate.savepdffile("omrSheet", data);
                    }
-                  if(totalQuestions>80 && totalQuestions<=252){
+                  if(totalQuestions>56 && totalQuestions<=228){
                     pdf.addPage(pw.Page(pageTheme: pw.PageTheme( pageFormat:PdfPageFormat.a3.copyWith(
                        marginBottom: 15,marginLeft: 15,marginRight: 15,marginTop: 15,),orientation: pw.PageOrientation.portrait,)
                       ,build: (pw.Context context) { 
-                       return pw.Center(child:_content(context,hght,wid,optionslist,capitalLetters,80,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages));},));
+                       return pw.Center(child:_content(context,hght,wid,optionslist,capitalLetters,56,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages,ArucoImages4,totalmcq));},));
               
                      pdf.addPage(pw.Page(pageTheme: pw.PageTheme( pageFormat:PdfPageFormat.a3.copyWith(
                         marginBottom: 15,marginLeft: 15,marginRight: 15,marginTop: 15,),orientation: pw.PageOrientation.portrait,)
                         ,build: (pw.Context context) { 
-                        return pw.Center(child:_content2(context,hght,wid,optionslist,capitalLetters,totalQuestions-80,80,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages2));},));
+                        return pw.Center(child:_content2(context,hght,wid,optionslist,capitalLetters,totalQuestions-56,56,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages2,totalmcq));},));
                      
                      final data = await pdfgenerate.genpdf(pdf);
                       pdfgenerate.savepdffile("omrSheet", data);
@@ -272,34 +291,57 @@ submit_details(fname,lname,hght,wid,capitalLetters) async{
                      pdf.addPage(pw.Page(pageTheme: pw.PageTheme( pageFormat:PdfPageFormat.a3.copyWith(
                               marginBottom: 15,marginLeft: 15,marginRight: 15,marginTop: 15,),orientation: pw.PageOrientation.portrait,)
                               ,build: (pw.Context context) { 
-                              return pw.Center(child:_content(context,hght,wid,optionslist,capitalLetters,80,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages));},));
+                              return pw.Center(child:_content(context,hght,wid,optionslist,capitalLetters,56,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages,ArucoImages4,totalmcq));},));
               
                     pdf.addPage(pw.Page(pageTheme: pw.PageTheme( pageFormat:PdfPageFormat.a3.copyWith(
                                 marginBottom: 15,marginLeft: 15,marginRight: 15,marginTop: 15,),orientation: pw.PageOrientation.portrait,)
                                 ,build: (pw.Context context) { 
-                                return pw.Center(child:_content2(context,hght,wid,optionslist,capitalLetters,172,80,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages2));},));
+                                return pw.Center(child:_content2(context,hght,wid,optionslist,capitalLetters,172,56,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages2,totalmcq));},));
                          
                     pdf.addPage(pw.Page(pageTheme: pw.PageTheme( pageFormat:PdfPageFormat.a3.copyWith(
                                 marginBottom: 15,marginLeft: 15,marginRight: 15,marginTop: 15,),orientation: pw.PageOrientation.portrait,)
                                 ,build: (pw.Context context) { 
-                                return pw.Center(child:_content2(context,hght,wid,optionslist,capitalLetters,totalQuestions-252,252,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages3));},));
-                          final data = await pdfgenerate.genpdf(pdf);
-                          pdfgenerate.savepdffile("omrSheet", data);
+                                return pw.Center(child:_content2(context,hght,wid,optionslist,capitalLetters,totalQuestions-228,228,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages3,totalmcq));},));
+                    final data = await pdfgenerate.genpdf(pdf);
+                    pdfgenerate.savepdffile("omrSheet", data);
                    }
            }}
 }
 
-pw.Widget _content(pw.Context content,hght,wid,optionslist,letters,totalquestions,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages){ 
+pw.Widget _content(pw.Context content,hght,wid,optionslist,letters,totalquestions,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages,ArucoImages4,totalmcq){ 
     return pw.Container(color: PdfColors.pink50,child: pw.Column(children: [
-    head.header1(letters, hght, wid, optionslist, rollno, fullname, _selectedSet, _classNameController, ins,_RollNoController),
-    pw.SizedBox(height: 20),
+    pw.SizedBox(height: 10),
+   /* pw.Row(children: [
+      pw.SizedBox(width: 10),
+      pw.Container(height: 30,width: 30,alignment:pw.Alignment.topLeft,child: ArucoImages4[0]),
+      pw.SizedBox(height: 30,width: 730),
+      pw.Container(height: 30,width: 30,alignment:pw.Alignment.topRight,child: ArucoImages4[1])
+    ]),*/
+    head.header1(letters, hght, wid, optionslist, rollno, fullname, _selectedSet, _classNameController,_RollNoController),
+     pw.SizedBox(height: 10),
+    pw.Row(children:[
+       pw.SizedBox(width: 20),
+       pw.SizedBox(child: pw.Text("NOTE:",style: pw.TextStyle(height: 20,fontWeight:pw.FontWeight.bold)),),
+       pw.SizedBox(width: 5),
+       pw.Container(width:715,child: pw.Text(ins,style: pw.TextStyle(height: 20)),
+          padding: pw.EdgeInsets.all(3),decoration: pw.BoxDecoration(color: PdfColors.white,border: pw.Border.all(color: PdfColors.pink))),
+     ] ),
+     
+     pw.SizedBox(height: 10),
+   /*  pw.Row(children: [
+      pw.SizedBox(width: 10),
+      pw.Container(height: 30,width: 30,alignment:pw.Alignment.topLeft,child: ArucoImages4[2]),
+      pw.SizedBox(height: 30,width: 730),
+      pw.Container(height: 30,width: 30,alignment:pw.Alignment.topRight,child: ArucoImages4[3])
+    ]),*/
+    pw.SizedBox(height: 15),
     pw.Row(children: [
       pw.SizedBox(width: 10),
       pw.Container(height: 30,width: 30,alignment:pw.Alignment.topLeft,child: ArucoImages[0]),
       pw.SizedBox(height: 30,width: 730),
       pw.Container(height: 30,width: 30,alignment:pw.Alignment.topRight,child: ArucoImages[1])
     ]),
-    sheet.omrRow(totalquestions),
+    sheet.omrRow(totalquestions,totalmcq),
      pw.Row(children: [
       pw.SizedBox(width: 10),
       pw.Container(height: 30,width: 30,alignment:pw.Alignment.topLeft,child: ArucoImages[2]),
@@ -310,7 +352,7 @@ pw.Widget _content(pw.Context content,hght,wid,optionslist,letters,totalquestion
     ]));
     }
 
-pw.Widget _content2(pw.Context content,hght,wid,optionslist,letters,totalquestions,start_index,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages){
+pw.Widget _content2(pw.Context content,hght,wid,optionslist,letters,totalquestions,start_index,rollno,fullname,_selectedSet,_classNameController,ins,_RollNoController,ArucoImages,totalmcq){
     return pw.Container(color: PdfColors.pink50,child: pw.Column(children: [
     pw.SizedBox(height: 20),
     pw.Row(children: [
@@ -319,7 +361,7 @@ pw.Widget _content2(pw.Context content,hght,wid,optionslist,letters,totalquestio
       pw.SizedBox(height: 30,width: 730),
       pw.Container(height: 30,width: 30,alignment:pw.Alignment.topRight,child: ArucoImages[1])
     ]),
-    sheetnew.omrRow(totalquestions,start_index),
+    sheetnew.omrRow(totalquestions,start_index,totalmcq),
      pw.Row(children: [
       pw.SizedBox(width: 10),
       pw.Container(height: 30,width: 30,alignment:pw.Alignment.topLeft,child: ArucoImages[2]),

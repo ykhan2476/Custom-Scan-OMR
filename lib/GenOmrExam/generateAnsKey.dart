@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:omr_reader/GenOmrExam/ResultPage.dart';
 
@@ -159,7 +157,9 @@ class _generateAnsKeyState extends State<generateAnsKey> {
                   score=0;
                 });
                 Navigator.push(context,MaterialPageRoute(builder: (context) =>ResultPage(details: widget.details) ));
-              }, child: Text('CHECK RESULT'))
+              }, 
+              style:ElevatedButton.styleFrom(backgroundColor: Colors.blue[900],foregroundColor: Colors.white),
+              child: Text('CHECK RESULT'))
             ],
           ),
         ),

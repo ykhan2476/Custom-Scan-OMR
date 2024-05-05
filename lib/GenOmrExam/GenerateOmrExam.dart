@@ -175,7 +175,7 @@ class _GenerateOmrExamState extends State<GenerateOmrExam> {
                           );
                         }
                       },
-                      style:ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(246, 13, 21, 238)),
+                      style:ElevatedButton.styleFrom(backgroundColor: Colors.blue[900]),
                       child: Text('Generate Exam',style: TextStyle(color: Colors.white),),
                     ),
                   ),)

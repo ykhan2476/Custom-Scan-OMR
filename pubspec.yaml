@@ -51,7 +51,9 @@ dependencies:
   process: ^5.0.2
   flython: ^0.2.0
   http: ^1.2.1
-  opencv_dart: ^0.6.3
+  motion_tab_bar: ^2.0.4
+  transformable_list_view: ^0.5.0
+  
   crop_your_image: ^1.0.2
 
 dev_dependencies:
