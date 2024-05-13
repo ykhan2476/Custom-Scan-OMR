@@ -28,6 +28,5 @@ Overall, this custom scan OMR application offers a modern and efficient solution
 https://github.com/ykhan2476/Custom-Scan-OMR/assets/113904335/ca4f9d8d-1bcf-45ef-9010-ff5397df85ff
 
 
-https://github.com/ykhan2476/Custom-Scan-OMR/assets/113904335/3a386a7b-0115-4b68-84a2-72c444095a11
-
+https://github.com/ykhan2476/Custom-Scan-OMR/assets/113904335/a7920354-779f-4fec-9a89-6bba6da4463a
 
