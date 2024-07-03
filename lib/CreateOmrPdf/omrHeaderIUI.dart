@@ -63,7 +63,7 @@ class omrHeader{
     pw.Column(children:[
                pw.Text('OMR SHEET',style: pw.TextStyle(fontSize: 19,fontWeight: pw.FontWeight.bold)),
                pw.SizedBox(height: 10,),
-               pw.Container(height: 60,width: 110,padding:pw.EdgeInsets.all(10),decoration:pw.BoxDecoration(border: pw.Border.all(color: PdfColors.pink),color: PdfColors.white),child:pw.BarcodeWidget(barcode: Barcode.code39(),data:'$barcodeData')),
+               pw.Container(height: 60,width: 110,padding:pw.EdgeInsets.all(10),decoration:pw.BoxDecoration(border: pw.Border.all(color: PdfColors.pink),color: PdfColors.white),child:pw.BarcodeWidget(barcode: Barcode.gs128(),data:'$barcodeData')),
                pw.SizedBox(height: 15,),
                pw.Container(height: 20,width: 110,decoration:pw.BoxDecoration(border: pw.Border.all(color: PdfColors.pink),color: PdfColors.pink100),child:pw.Center(child: pw.Text('Answer Sheet No.'),))
                ,

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-import 'package:omr_reader/widget/animation.dart';
+import 'package:omr_reader/Home/footer.dart';
 
 
 class splash extends StatefulWidget {
@@ -21,12 +21,12 @@ class _splashState extends State<splash> {
   _navigatehome() async {
     await Future.delayed(Duration(seconds: 4), () {});
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => animation()));
+        context, MaterialPageRoute(builder: (context) => footer()));
   }
 
   @override
   Widget build(BuildContext context) {
-    double hght = MediaQuery.of(context).size.height;
+  
     double wid = MediaQuery.of(context).size.width;
     return Scaffold(
             body: SingleChildScrollView(child:Column(children: [ 

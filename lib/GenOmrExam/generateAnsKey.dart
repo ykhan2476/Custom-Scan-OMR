@@ -27,6 +27,7 @@ class _generateAnsKeyState extends State<generateAnsKey> {
   late List<int> questions;
   late double hght;
   late double wid;
+  late List<List> FinalAnsKey=[];
   int score=0; 
   
 
@@ -34,7 +35,7 @@ class _generateAnsKeyState extends State<generateAnsKey> {
   void initState() {
     super.initState();
     sections = widget.totalSections2;
-    optionslist = ['A', 'B', 'C', 'D', 'E'];
+    optionslist = ['A', 'B', 'C', 'D', 'E','F','G','H'];
     questions = widget.questionsInSection2;
     selectedAnsOptions = List.generate(sections, (_) => List.filled(questions.fold<int>(0, (prev, curr) => prev + curr), 0));
     submittedAnsOptions = List.generate(sections, (_) => List.filled(questions.fold<int>(0, (prev, curr) => prev + curr), 0)); // Initialize with -1
@@ -73,6 +74,50 @@ class _generateAnsKeyState extends State<generateAnsKey> {
   print("Wrong Answers: $wrongAnswers");
 }
 
+
+AnsKey(oldAnsKey){
+     late List<List> FinalAnsKey=[];
+    print("questions${questions}");
+    for (int i=0; i<questions.length;i++){
+      List<int> newAnsKey = oldAnsKey[i].sublist(0, questions[i]);
+      List<int> modifiedList = newAnsKey.map((element) => element - 1).toList();
+      FinalAnsKey.add(modifiedList);
+    }
+    print(FinalAnsKey);
+    return FinalAnsKey;
+  }
+
+
+bool allQuestionsAnswered() {
+  for (int i = 0; i < FinalAnsKey.length; i++) {
+   
+      if (FinalAnsKey[i].contains(-1)) {
+        return false;
+      }}
+  
+    return true;
+  }
+
+  void showWarningDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Incomplete Submission"),
+          content: Text("Please fill  each answer in the AnswerKey "),
+          actions: <Widget>[
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
    Widget build(BuildContext context) {
     widget.details.add(submittedAnsOptions.length.toString());
@@ -80,83 +125,69 @@ class _generateAnsKeyState extends State<generateAnsKey> {
     wid = MediaQuery.of(context).size.width;
     int posMarks= int.parse(widget.details[5]);
     int negMarks= int.parse(widget.details[6]);
-    List<int> quesDetails=[];
+    //List<int> quesDetails=[];
     return Scaffold(
      appBar: AppBar(title: Text('Answer Key'),),
       body: 
       SingleChildScrollView(scrollDirection: Axis.vertical,child: 
       Container(
-          margin: EdgeInsets.all((widget.totalmcq==4)?20:10),
-          padding: EdgeInsets.all((widget.totalmcq==4)?20:10),
+          margin: EdgeInsets.all((10)),
+          padding: EdgeInsets.all(10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               
               for (int i = 0; i < sections; i++)
+              Center(child:
                   Column(
                   children: [
                     Container(
                       child: Text('SECTION ${i + 1}',style: TextStyle(fontWeight:FontWeight.bold,fontSize: 18)),
                     ),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: questions[i],
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          leading: Text((index + 1).toString(),style: TextStyle(fontWeight:FontWeight.bold),),
-                          title: Container(
-                            height: wid * 0.115,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                for (int j = 0; j < widget.totalmcq; j++)
-                                  MaterialButton(
-                                    minWidth: 10,
-                                    height: wid * 0.115,
-                                    color: selectedAnsOptions[i][index] == j+1
-                                        ? Colors.black // Change background color if selected
-                                        : Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(100),
-                                      side: BorderSide(
-                                        color:  selectedAnsOptions[i][index] == j+1
-                                            ? Colors.black
-                                            : Colors.pink,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        selectedAnsOptions[i][index] = j+1;
-                                      });
-                                    },
-                                    child: Text(
-                                      optionslist[j],
-                                      style: TextStyle(
-                                        color:  selectedAnsOptions[i][index] == j+1
-                                            ? Colors.white
-                                            : Colors.pink,
-                                      ),
-                                    ),
-                                  )
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                    
+                    
+               for (int index = 0; index < questions[i]; index++)
+                Container(child: Column( children: [
+                  Container(height: wid * 0.13,child: Row(
+                  mainAxisSize: MainAxisSize.min,children: [
+                    Container(padding: EdgeInsets.only(top:10,right: 10),height: wid * 0.115,child: Text("${index+1}",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),),
+                    for (int j = 0; j < widget.totalmcq; j++)
+                      MaterialButton(height: wid * 0.115,minWidth: 5,
+                        color: selectedAnsOptions[i][index] == j + 1 ? Colors.black  : Colors.white,
+                        shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(100),
+                          side: BorderSide(color: selectedAnsOptions[i][index] == j + 1? Colors.black : Colors.pink, ),),
+                        onPressed: () {setState(() { selectedAnsOptions[i][index] = j + 1; }); },
+                        child: Text(optionslist[j], style: TextStyle(
+                            color: selectedAnsOptions[i][index] == j + 1? Colors.white: Colors.pink,),),)
+                  ],),
+              ),],),),
+
+
+
                   ],
-                ),
+                ), ),
               ElevatedButton(onPressed: (){
                 //selectedAnsOptions = List.from(submittedAnsOptions);
                 submittedAnsOptions = List.from(selectedAnsOptions);
                 print(widget.submittedOptions);
                 print(submittedAnsOptions);
+                FinalAnsKey= AnsKey(submittedAnsOptions);
+                print(FinalAnsKey);
                 checkResult(posMarks,negMarks);
                print(widget.details);
                 setState(() {
                   score=0;
                 });
-                Navigator.push(context,MaterialPageRoute(builder: (context) =>ResultPage(details: widget.details) ));
+               
+
+                if (allQuestionsAnswered()) {
+                    Navigator.push(context,MaterialPageRoute(builder: (context) =>ResultPage(details: widget.details) ));
+
+              }
+              else{
+                  showWarningDialog(context);
+              }
+
               }, 
               style:ElevatedButton.styleFrom(backgroundColor: Colors.blue[900],foregroundColor: Colors.white),
               child: Text('CHECK RESULT'))

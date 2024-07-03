@@ -43,7 +43,7 @@ class _ShowOmrExamState extends State<ShowOmrExam> {
   void initState() {
     super.initState();
     sections = widget.totalSections;
-    optionslist = ['A', 'B', 'C', 'D', 'E'];
+    optionslist = ['A', 'B', 'C', 'D', 'E','F','G','H'];
     questions = widget.questionsInSection;
     selectedOptions = List.generate(sections, (_) => List.filled(questions.fold<int>(0, (prev, curr) => prev + curr), 0));
     submittedOptions = List.generate(sections, (_) => List.filled(questions.fold<int>(0, (prev, curr) => prev + curr), -1)); // Initialize with -1
@@ -109,72 +109,38 @@ class _ShowOmrExamState extends State<ShowOmrExam> {
                 ],)
               ],)
               
-              /*  Container(child: Column(children:[
-                 SizedBox(height:20,),
-                Container(height: 25,width: wid*0.86,decoration:BoxDecoration(border: Border.all(color: Colors.pink),
-                color: const Color.fromARGB(255, 226, 176, 193)),child: const Text('Instuctions For The Exam'),)
-              ,Container(width: wid*0.86,decoration:BoxDecoration(border:Border.all(color: Colors.pink),
-                color: Colors.white),child: const Text('1.'),)
-              ]
-              ),),*/
+    
               
               ],),),
-              Container(margin: EdgeInsets.all((widget.totalmcq==4)?20:10),padding: EdgeInsets.all((widget.totalmcq==4)?20:10),child: Column(children: [
+              Container(margin: EdgeInsets.all(5),padding: EdgeInsets.all((widget.totalmcq==4 || widget.totalmcq==3)?20:10),child: Column(children: [
               for (int i = 0; i < sections; i++)
+              Center(child: 
                   Column(
                   children: [
                     SizedBox(height: 20,),
                     Container(
                       child: Text('SECTION ${i + 1}',style: TextStyle(fontWeight:FontWeight.bold,fontSize: 20)),
                     ),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: questions[i],
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          leading: Text((index + 1).toString(),style: TextStyle(fontWeight:FontWeight.bold),),
-                          title: Container(
-                            height: wid * 0.115,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                for (int j = 0; j < widget.totalmcq; j++)
-                                  MaterialButton(
-                                    height: wid*0.115,
-                                    minWidth: 10,
-                                    color: selectedOptions[i][index] == j+1
-                                        ? Colors.black // Change background color if selected
-                                        : Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(100),
-                                      side: BorderSide(
-                                        color: selectedOptions[i][index] == j+1
-                                            ? Colors.black
-                                            : Colors.pink,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        selectedOptions[i][index] = j+1;
-                                      });
-                                    },
-                                    child: Text(
-                                      optionslist[j],
-                                      style: TextStyle(
-                                        color: selectedOptions[i][index] == j+1
-                                            ? Colors.white
-                                            : Colors.pink,
-                                      ),
-                                    ),
-                                  )
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+
+               for (int index = 0; index < questions[i]; index++)
+                Container(child: Column( children: [
+                  Container(height: wid * 0.13,child: Row(
+                  mainAxisSize: MainAxisSize.min,children: [
+                    Container(padding: EdgeInsets.only(top:10,right:10),height: wid * 0.115,child: Text("${index+1}",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),),
+                    for (int j = 0; j < widget.totalmcq; j++)
+                      MaterialButton(height: wid * 0.115,minWidth: 5,
+                        color: selectedOptions[i][index] == j + 1 ? Colors.black  : Colors.white,
+                        shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(100),
+                          side: BorderSide(color: selectedOptions[i][index] == j + 1? Colors.black : Colors.pink, ),),
+                        onPressed: () {setState(() { selectedOptions[i][index] = j + 1; }); },
+                        child: Text(optionslist[j], style: TextStyle(
+                            color: selectedOptions[i][index] == j + 1? Colors.white: Colors.pink,),),)
+                  ],),
+              ),],),),
+
                   ],
                 ),
+              ),
               ElevatedButton(onPressed: (){
                 
                 submittedOptions = List.from(selectedOptions);

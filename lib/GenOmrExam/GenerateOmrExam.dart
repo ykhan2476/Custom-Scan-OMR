@@ -44,9 +44,13 @@ class _GenerateOmrExamState extends State<GenerateOmrExam> {
     super.dispose();
   }
 
+
+  
+ 
+
   @override
   Widget build(BuildContext context) {
-    Uri url = Uri.parse('http://omrapp.com/exam?id=123');
+    
     //double hght = MediaQuery.of(context).size.height;
     double wid = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -101,7 +105,7 @@ class _GenerateOmrExamState extends State<GenerateOmrExam> {
                     DropdownButton<int>(value: totalmcq,
                        onChanged: (int? newValue) {
                                   setState(() {totalmcq = newValue!;});},
-                     items: <int>[4,5].map<DropdownMenuItem<int>>((int value) {
+                     items: <int>[3,4,5,6].map<DropdownMenuItem<int>>((int value) {
                     return DropdownMenuItem<int>(value: value,child: Text('        $value'),);}).toList(),hint: Text('Select a set'), ),
                     ],),
                     Row(children: [

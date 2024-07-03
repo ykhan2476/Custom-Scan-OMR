@@ -1,9 +1,15 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:omr_reader/checkSheet/Sets.dart';
 import 'package:omr_reader/checkSheet/pickimage.dart';
+import 'package:hive/hive.dart';
+
+
+import 'package:omr_reader/main.dart';
 
 class answerkeytemplate extends StatefulWidget {
-
+  final String set;
   final int totalSections;
   final int totalmcq;
   final List<int> questionsInSection;
@@ -13,6 +19,7 @@ class answerkeytemplate extends StatefulWidget {
 
   const answerkeytemplate({
     Key? key,
+    required this.set,
     required this.posMarks,
     required this.negMarks,
     required this.totalSections,
@@ -35,6 +42,7 @@ class _answerkeytemplateState extends State<answerkeytemplate> {
   late double wid;
   late List<List> FinalAnsKey=[];
   String date = '${DateTime.now().day}-${DateTime.now().month}-${DateTime.now().year}';
+    
 
   @override
   void initState() {
@@ -47,16 +55,52 @@ class _answerkeytemplateState extends State<answerkeytemplate> {
     selectedOptions = List.generate(sections, (_) => List.filled(questions.fold<int>(0, (prev, curr) => prev + curr), 0));
 
   }
+
+   
+
   AnsKey(oldAnsKey){
      late List<List> FinalAnsKey=[];
     print("questions${questions}");
     for (int i=0; i<questions.length;i++){
       List<int> newAnsKey = oldAnsKey[i].sublist(0, questions[i]);
-      FinalAnsKey.add(newAnsKey);
+      List<int> modifiedList = newAnsKey.map((element) => element - 1).toList();
+      FinalAnsKey.add(modifiedList);
     }
     print(FinalAnsKey);
     return FinalAnsKey;
   }
+
+ bool allQuestionsAnswered() {
+  for (int i = 0; i < FinalAnsKey.length; i++) {
+   
+      if (FinalAnsKey[i].contains(-1)) {
+        return false;
+      }}
+  
+    return true;
+  }
+
+  void showWarningDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Incomplete Submission"),
+          content: Text("Please fill  each answer in the AnswerKey"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     int totalQuestions = widget.questionsInSection.reduce((value, element) => value + element);
@@ -92,15 +136,41 @@ class _answerkeytemplateState extends State<answerkeytemplate> {
                             color: selectedOptions[i][index] == j + 1? Colors.white: Colors.pink,),),)
                   ],),
               ),],),),], ),
-              ElevatedButton(onPressed: (){  
+              ElevatedButton(onPressed: () async {  
+               
                 submittedOptions = List.from(selectedOptions);
                 print(submittedOptions);
                 FinalAnsKey= AnsKey(submittedOptions);
                 print(FinalAnsKey);
-                Navigator.push( context,MaterialPageRoute(builder: (context) =>ImagePickerScreen(AnsKey: FinalAnsKey, totalmcq: widget.totalmcq, posMarks: widget.posMarks, negMarks: widget.negMarks, totalquestions: widget.totalquestions,)),);
-              },
+                if (allQuestionsAnswered()) {
+                Map<String, dynamic> Answerkey = {
+                  'Set':widget.set,
+                  'AnsKey':FinalAnsKey,
+                  'totalmcq': widget.totalmcq,
+                  'posMarks':  widget.posMarks,
+                  'negMarks':  widget.negMarks,
+                  'totalquestions':widget.totalquestions,
+                  'totalColumns':widget.totalSections
+                };
+                print(Answerkey);
+                String TemplateName ='${widget.set}${widget.totalmcq}${widget.posMarks}${widget.negMarks}${widget.totalquestions}${widget.totalSections}';
+                print(TemplateName);
+                var box = await Hive.openBox('Answerkey');
+                await box.put(TemplateName,Answerkey);
+
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:
+                Text(" Set  ${widget.set}  successfully saved "),),);
+                runApp(MyApp());
+                //Navigator.pop(context);
+                Navigator.push( context,MaterialPageRoute(builder: (context) =>Sets(Template: Answerkey, questionsInSection: widget.questionsInSection)),);
+
+                //Navigator.push( context,MaterialPageRoute(builder: (context) =>ImagePickerScreen(AnsKey: FinalAnsKey, totalmcq: widget.totalmcq, posMarks: widget.posMarks, negMarks: widget.negMarks, totalquestions: widget.totalquestions, totalColumns: widget.totalSections,)),);
+              }
+              else{
+                  showWarningDialog(context);
+              }},
               style:ElevatedButton.styleFrom(backgroundColor:Color.fromARGB(255,13,71,161),foregroundColor: Colors.white), 
-              child: Text('SUBMIT'))
+              child: Text('Save'))
               
               ])),
             ],
@@ -110,3 +180,22 @@ class _answerkeytemplateState extends State<answerkeytemplate> {
     );
   }
 }
+
+/*
+import 'package:hive/hive.dart';
+import 'dart:async';
+import 'dart:developer';
+var box = await Hive.openBox('Track_Event');
+      await box.put(
+        DateTime.now().toString(),
+        {
+          'eventtype': eventType,
+          'eventtime': eventTime,
+          'packageName': packageName,
+        },
+      );
+*/
+void _triggerHotReload(BuildContext context) {
+    
+    
+  }

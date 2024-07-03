@@ -196,7 +196,7 @@ class _CreateOmrPdfState extends State<CreateOmrPdf> {
 
 submit_details(fname,lname,hght,wid,capitalLetters) async{
   //generating aruco marker  indexes
-   Random random = Random();
+   //Random random = Random();
    List<pw.Image> ArucoImages = [];
   List<pw.Image> ArucoImages2 = [];
   List<pw.Image> ArucoImages3 = [];

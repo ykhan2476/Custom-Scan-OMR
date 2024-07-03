@@ -1,28 +1,36 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:omr_reader/checkSheet/Sets.dart';
 import 'package:omr_reader/checkSheet/answerkeytemplate.dart';
+import 'package:omr_reader/main.dart';
 
-class Template extends StatefulWidget {
-  const Template({Key? key});
+class CreateTemplate extends StatefulWidget {
+  const CreateTemplate({Key? key});
 
   @override
-  State<Template> createState() => _TemplateState();
+  State<CreateTemplate> createState() => _CreateTemplateState();
 }
 
-class _TemplateState extends State<Template> {
+class _CreateTemplateState extends State<CreateTemplate> {
 List<TextEditingController> columnQuestionsControllers = [];
 TextEditingController columns = TextEditingController();
 TextEditingController mcqs = TextEditingController();  
 TextEditingController posmarks = TextEditingController(); 
 TextEditingController negmarks = TextEditingController(); 
  List<int> columnQuestionsCount = [];
+ String? _selectedSet;
+ int? questionssum;
+List<Map<String, dynamic>> AnswerKeys = [];
+
+  
 final _formKey2= GlobalKey<FormState>();
 int col = 0;
 bool fill = false;
  @override
-  void initState() {
+  void initState(){
     super.initState();
   }
+
 
 
    List<Widget> generateQuestions(int columns) {
@@ -56,11 +64,14 @@ bool fill = false;
      )],)); }}
       return formfieldques;
   }
+ 
+
 
 
   @override
   Widget build(BuildContext context) {
     double wid = MediaQuery.of(context).size.width;
+
     return Scaffold(
       body: SingleChildScrollView(child: Column(
           children: [
@@ -132,18 +143,30 @@ bool fill = false;
               if(fill==true)
             Column(children: generateQuestions(int.tryParse(columns.text) ?? 0),),
              SizedBox(height: 20),
+            
              if(fill==true)
-            Center(child:
+              Center(child:
             ElevatedButton(
-              style:ElevatedButton.styleFrom(backgroundColor:Colors.blue[900],foregroundColor: Colors.white),
+              style:ElevatedButton.styleFrom(backgroundColor:Color.fromRGBO(255, 0, 22, 100),foregroundColor: Colors.white),
               onPressed: () {
-                
+                runApp(MyApp());
                 print(columnQuestionsCount);
-                int questionssum = columnQuestionsCount.reduce((value, element) => value + element);
-                print(columns.text);
-                print(mcqs.text);
-                print(posmarks.text);
-                print(negmarks.text);
+                
+                setState(() {
+                  questionssum = columnQuestionsCount.reduce((value, element) => value + element);
+                });
+                String TemplateName ='${mcqs.text}${posmarks.text.toString()}${negmarks.text.toString()}${questionssum!}${columns.text}';
+                print(TemplateName);
+                Map<String, dynamic> template = {
+                  'templateName':TemplateName,
+                  'totalmcq': int.parse(mcqs.text),
+                  'posMarks': posmarks.text.toString(),
+                  'negMarks':  negmarks.text.toString(),
+                  'totalquestions':questionssum!,
+                  'totalColumns':int.parse(columns.text),
+                  'questionsInSection':columnQuestionsCount,
+                };
+                
                if(int.parse(mcqs.text) >6 ){
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:
                 Text('total mcq options should be less than or equal to 6 '),),);
@@ -156,20 +179,61 @@ bool fill = false;
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:
                 Text(" mcq options can't be 0  "),),);
                }
+
                else{
-                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => 
+                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => Sets(Template: template, questionsInSection: columnQuestionsCount,)));
+               /*  Navigator.of(context).push(MaterialPageRoute(builder: (context) => 
                  answerkeytemplate(totalSections: int.parse(columns.text),
                                    questionsInSection:columnQuestionsCount,
-                                    totalmcq: int.parse(mcqs.text), posMarks: "5", negMarks: "1", totalquestions:questionssum,)));
-               }
+                                    totalmcq: int.parse(mcqs.text), posMarks:posmarks.text.toString(), negMarks: negmarks.text.toString(), totalquestions:questionssum!, set: _selectedSet!,)));
+               */}
                 //answerkey( int.parse(columns.text),columnQuestionsCount,int.parse(mcqs.text));
-                 
-              },child: Text('Generate Answer Key'), ), )
+              
+              },child: Text('NEXT'), ), ),
+
+
+/*
+
+
+             Container(margin: EdgeInsets.all(20),decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),border: Border.all(color: Color.fromARGB(255,13,71,161))),
+             child: Column(children: [
+                Row(children: [
+                 SizedBox(width: 50,),
+                 Text("Add new Set",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16,color:Color.fromARGB(255,13,71,161) ),),
+                 SizedBox(width: 50,),
+                 DropdownButton<String>(value: _selectedSet,
+                       onChanged: (String? newValue) {
+                                  setState(() {_selectedSet = newValue;});},
+                     items: <String>['A', 'B', 'C', 'D','F','G','H'].map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(value: value,child: Text('        $value'),);}).toList(),hint: Text('Select a set'), ),
+             ],),
+             
+           
+              SizedBox(height: 10,),
+
+             
+             ],),),
+            for(int i=0;i<AnswerKeys.length;i++)
+            Text('Set ${AnswerKeys[i]['Set']} saved '),
+             
+             
+             
+             //SizedBox(height: 10),
+            ElevatedButton(
+            onPressed: (){
+              //Navigator.push( context,MaterialPageRoute(builder: (context) =>ImagePickerScreen(AnsKey: FinalAnsKey, totalmcq: widget.totalmcq, posMarks: widget.posMarks, negMarks: widget.negMarks, totalquestions: widget.totalquestions, totalColumns: widget.totalSections,)),);
+
+            }, 
+            style:ElevatedButton.styleFrom(backgroundColor:Colors.blue[900],foregroundColor: Colors.white),
+            child: Text('Check OMR Sheet'))
+
+             */
+            
              ],)
      )]),
       ),
     );
   }
 }
-
-
+                //Navigator.push( context,MaterialPageRoute(builder: (context) =>ImagePickerScreen(AnsKey: FinalAnsKey, totalmcq: widget.totalmcq, posMarks: widget.posMarks, negMarks: widget.negMarks, totalquestions: widget.totalquestions, totalColumns: widget.totalSections,)),);
+//      if(key.contains('${mcqs.text}${posmarks.text}${negmarks.text}$questionssum${int.parse(columns.text)}')){

@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:omr_reader/GenOmrExam/GenerateOmrExam.dart';
 import 'package:omr_reader/CreateOmrPdf/CreateOmrPdf.dart';
-import 'package:omr_reader/widget/animation.dart';
-import 'package:omr_reader/checkSheet/template.dart';
+import 'package:omr_reader/checkSheet/Show.dart';
+
 
 class home extends StatefulWidget {
   const home({super.key,});
@@ -18,9 +18,9 @@ class _homeState extends State<home> {
   @override
   Widget build(BuildContext context) {
     double wid = MediaQuery.of(context).size.width;
-     List Cardname =['Take Exam','Create OMR','Scan OMR','Details'];
-     List CardImage=['assets/images/card1.jpg','assets/images/card2.jpg','assets/images/scan.png','assets/images/card4.jpg'];
-    List cardfunc=[GenerateOmrExam(),CreateOmrPdf(),Template(),animation()];
+     List Cardname =['Take Exam','Create OMR','Scan OMR'];
+     List CardImage=['assets/images/card1.jpg','assets/images/card2.jpg','assets/images/scan.png'];
+    List cardfunc=[GenerateOmrExam(),CreateOmrPdf(),ShowTemplates()];
     return Scaffold(
     body: Container(margin: EdgeInsets.all(30),child: SingleChildScrollView(scrollDirection:Axis.vertical,child:Column(children: [
       

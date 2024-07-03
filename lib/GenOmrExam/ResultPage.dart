@@ -1,25 +1,61 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:hive/hive.dart';
+
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:flutter/services.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
-class ResultPage extends StatelessWidget {
+class ResultPage extends StatefulWidget {
+
   final List<String> details;
-  
 
-  ResultPage({
-    required this.details,
-    
-  });
+  ResultPage({required this.details});
+
+  @override
+  _ResultPageState createState() => _ResultPageState();
+}
+class PDFservices{
+  Future<Uint8List> genpdf(pdf){
+    return pdf.save();
+  }
+  Future<void> savepdffile(String filename,Uint8List bytelist) async{
+    final output =await getTemporaryDirectory();
+    var filePath ="${output.path}/${filename}.pdf";
+    final file =File(filePath);
+    await file.writeAsBytes(bytelist);
+    await OpenFile.open(filePath);
+  }
+}
+
+class _ResultPageState extends State<ResultPage> {
+  
+  PDFservices pdfReport = PDFservices();
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
+     final List<String> details=widget.details;
     double hght = MediaQuery.of(context).size.height;
     double wid = MediaQuery.of(context).size.width;
     int totalMarks =int.parse(details[7])*int.parse(details[5]);
     int MarksObtained =int.parse(details[9]);
     var Percentage =MarksObtained/totalMarks;
     var Accuracy =int.parse(details[10])/int.parse(details[7]);
+
+
+
+              
+    
+  
+  
+   
    
     //double Percentage = double.parse();
     return Scaffold(
@@ -60,6 +96,7 @@ class ResultPage extends StatelessWidget {
             
             ),
             SizedBox(height: 5,),
+            Stack(children: [
             Card(elevation: 3,color: Colors.white,margin: EdgeInsets.all(10),shadowColor: Colors.grey,child: 
             Row(children: [
               Column(children :[
@@ -81,6 +118,9 @@ class ResultPage extends StatelessWidget {
             ],)
             ],) 
             ),
+            if(isLoading)
+            Center(child: CircularProgressIndicator(strokeWidth: 5,valueColor: AlwaysStoppedAnimation(Colors.blue),),)],),
+
             SizedBox(height: 5,),
             Card(elevation: 3,color: Colors.white,margin: EdgeInsets.all(10),shadowColor: Colors.grey,child: 
             Row(children: [
@@ -107,11 +147,55 @@ class ResultPage extends StatelessWidget {
             SizedBox(height: 5,),
             Row(children: [
               SizedBox(width: 45,),
-              ElevatedButton(onPressed: (){}, 
+
+              ElevatedButton(onPressed: () async{
+                setState(() {
+                                isLoading = true;
+                              });
+                //ApiService()._saveResultToLocal(resultMap.toMap());
+                print(details);
+                Map<String, dynamic> ResultMap = {'Name': details[0],'Class': details[1],'Roll_no.':details[2],'Set': details[3],'Date':details[4],'Total_Marks':totalMarks,'MarksObtained':MarksObtained,'Percentage':(Percentage<0)?'Fail':double.parse((Percentage*100).toStringAsFixed(2)),'Accuracy':double.parse((Accuracy*100).toStringAsFixed(2))};
+                print(ResultMap);
+                
+                String Name ='${details[0]}${details[2]}${details[3]}${details[4]}${totalMarks}${MarksObtained}';
+                print(Name);
+                var box = await Hive.openBox('ResultMap');
+                await box.put(Name,ResultMap);
+                bool success =true;
+                setState(() {
+                  isLoading = false;
+                  });
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(success ? 'Exam data saved successfully' : 'Failed to save exam data'),backgroundColor: success ? Colors.green : Colors.red,),);
+              
+              
+              }, 
                 style:ElevatedButton.styleFrom(backgroundColor: Colors.blue[900],foregroundColor: Colors.white),
-                 child: const Text("Share",)),
+                 child: const Text("Save",)),
+
+
               SizedBox(width: 20,),
-              ElevatedButton(onPressed: (){}, 
+
+
+
+              ElevatedButton(onPressed: () async {
+                  final img = await rootBundle.load('assets/logo/CSOicon.png');
+                  final imageBytes = img.buffer.asUint8List(); 
+                  pw.Image image1 = pw.Image(pw.MemoryImage(imageBytes));
+                 
+                  Map<String, dynamic> ResultMap =
+                   {'Name': details[0],'Class': details[1],'Roll_no.':details[2],
+                   'Set': details[3],'Date':details[4],'Total_Marks':totalMarks,
+                   'MarksObtained':MarksObtained,'Percentage':(Percentage<0)?'Fail':double.parse((Percentage*100).toStringAsFixed(2)),'Accuracy':double.parse((Accuracy*100).toStringAsFixed(2))};
+                  final pdf = pw.Document();
+                  pdf.addPage(pw.Page(pageTheme: pw.PageTheme( pageFormat:PdfPageFormat.a4.copyWith(
+                      marginBottom: 15,marginLeft: 15,marginRight: 15,marginTop: 15,),orientation: pw.PageOrientation.portrait,)
+                      ,build: (pw.Context context) { 
+                        return pw.Center(child:_Report(context, hght, wid,ResultMap ,image1)
+                        );},));
+                    final data = await pdfReport.genpdf(pdf);
+                    pdfReport.savepdffile("Result Report", data);
+
+              }, 
                  style:ElevatedButton.styleFrom(backgroundColor:Color.fromRGBO(255, 0, 22, 100),foregroundColor: Colors.white),
                  child: Text("Generate Report"))
             ],)
@@ -119,7 +203,80 @@ class ResultPage extends StatelessWidget {
         ),
       )],),
     ));
-  }
+    }
+
+
+
+
+pw.Widget _Report(pw.Context content,hght,wid,Map,img){ 
+    return pw.Container(decoration: pw.BoxDecoration(gradient:pw.LinearGradient(colors: [PdfColors.white,PdfColors.pink50,])),child: pw.Column(children: [
+     pw.Row(children: [
+      pw.SizedBox(width: 10),
+      pw.Container(height: 150,width: 180,alignment:pw.Alignment.topLeft,child: img),
+      pw.SizedBox( child: pw.Text(' Exam Result Report',style: pw.TextStyle(fontSize: 30,color: PdfColors.pink,fontWeight: pw.FontWeight.bold),)),
+    ]),
+
+    pw.Center(child:
+      pw.Container(margin: pw.EdgeInsets.all(10),child:
+            pw.Column(children: [
+              pw.SizedBox(height: 20,),
+               pw.Center(child:pw.Text('Name: ${Map['Name']}',style: pw.TextStyle(fontSize: 21,fontWeight: pw.FontWeight.bold),)),
+            
+              pw.SizedBox(height: 30,),
+              pw.Row(children: [
+                pw.SizedBox(width: 40),
+                pw.SizedBox(width: 220,child:pw.Text('Class: ${Map['Class']}',style: pw.TextStyle(fontSize: 15,fontWeight: pw.FontWeight.bold),)),
+                pw.SizedBox(width: 10),
+                pw.SizedBox(child:pw.Text('Roll number: ${Map['Roll_no.']}',style: pw.TextStyle(fontSize: 15,fontWeight: pw.FontWeight.bold),)),
+
+              ]),
+              pw.SizedBox(height: 10),
+              pw.Row(children: [
+                pw.SizedBox(width: 40),
+                pw.SizedBox(width: 220,child:pw.Text('Set: ${Map['Set']}',style: pw.TextStyle(fontSize: 12,fontWeight: pw.FontWeight.bold),)),
+                pw.SizedBox(width: 10),
+                pw.SizedBox(width: 200,child:pw.Text('Date: ${Map['Date']}',style: pw.TextStyle(fontSize: 12,fontWeight: pw.FontWeight.bold),)),
+               
+              ]),
+              pw.SizedBox(height: 40),
+              pw.Row(children: [
+                pw.SizedBox(width: 40),
+                pw.SizedBox(width: 220,child:pw.Text('Total Marks: ${Map['Total_Marks']}',style: pw.TextStyle(fontSize: 15,fontWeight: pw.FontWeight.bold),)),
+                pw.SizedBox(width: 10),
+                pw.SizedBox(width: 200,child:pw.Text('Marks Obtained: ${Map['MarksObtained']}',style: pw.TextStyle(fontSize: 15,fontWeight: pw.FontWeight.bold),)),
+               
+              ]),
+              pw.SizedBox(height: 10),
+              pw.Row(children: [
+                pw.SizedBox(width: 40),
+                pw.SizedBox(width: 220,child:pw.Text('Percentage: ${Map['Percentage']}%',style: pw.TextStyle(fontSize: 15,fontWeight: pw.FontWeight.bold),)),
+                pw.SizedBox(width: 10),
+                pw.SizedBox(width: 200,child:pw.Text('Accuracy: ${Map['Accuracy']}%',style: pw.TextStyle(fontSize: 15,fontWeight: pw.FontWeight.bold),)),
+               
+              ]),
+              pw.SizedBox(height: 40),
+              pw.Row(children: [
+                pw.SizedBox(width: 40),
+                pw.SizedBox(width: 120,child:pw.Text('Percentage',style: pw.TextStyle(color: PdfColors.teal,fontSize: 15,fontWeight: pw.FontWeight.bold),)),
+                pw.Container(height: 30,width: Map['Percentage']*3,decoration: pw.BoxDecoration(gradient:pw.LinearGradient(colors: [PdfColors.lightBlue100,PdfColors.teal]))),
+                pw.SizedBox(width: 20),
+                pw.SizedBox(width: 40,child: pw.Text('${Map['Percentage']}%')),
+              ]),
+               pw.SizedBox(height: 20),
+              pw.Row(children: [
+                pw.SizedBox(width: 40),
+                pw.SizedBox(width: 120,child:pw.Text('Accuracy',style: pw.TextStyle(color: PdfColors.teal,fontSize: 15,fontWeight: pw.FontWeight.bold),)),
+                pw.Container(height: 30,width: Map['Accuracy']*3,decoration: pw.BoxDecoration(gradient:pw.LinearGradient(colors: [PdfColors.lightBlue100,PdfColors.teal]))),
+                pw.SizedBox(width: 20),
+                pw.SizedBox(width: 40,child: pw.Text('${Map['Accuracy']}%')),
+              ]),
+
+            ],) 
+            
+            ),  )
+    
+    ]));
+    }
 }
 
 

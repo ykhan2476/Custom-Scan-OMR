@@ -6,11 +6,12 @@ import 'package:omr_reader/checkSheet/ScanResult.dart';
 
 class ImagePickerScreen extends StatefulWidget {
   final List<List<dynamic>> AnsKey;
+  final int totalColumns;
   int totalmcq;
   final String posMarks;
   final String negMarks;
   final int totalquestions;
-  ImagePickerScreen({Key? key,required this.posMarks,required this.negMarks,required this.AnsKey,required this.totalmcq,required this.totalquestions}) : super(key: key);
+  ImagePickerScreen({Key? key,required this.posMarks,required this.negMarks,required this.AnsKey,required this.totalmcq,required this.totalquestions, required this.totalColumns}) : super(key: key);
 
   @override
   _ImagePickerScreenState createState() => _ImagePickerScreenState();
@@ -113,7 +114,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
       SizedBox(child: Text('Negative  Marking : ${widget.negMarks}',style: TextStyle(color:Color.fromRGBO(255, 0, 22, 100),fontWeight: FontWeight.bold,fontSize: 16)),),
       SizedBox(child: Text('Total MCQs : ${widget.totalmcq}',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16)),),
       SizedBox(height: 10,),])),
-    Container(margin: EdgeInsets.all(20),child: Text('Note: OMR sheets should include Aruco markers on the boundary corners to facilitate scanning.'),),
+      Container(margin: EdgeInsets.all(20),child: Text('Note: OMR sheets should include Aruco markers on the boundary corners to facilitate scanning.'),),
 
       if(_image != null)
         Center(child: 
@@ -124,7 +125,7 @@ class _ImagePickerScreenState extends State<ImagePickerScreen> {
       if(_image != null)
       ElevatedButton(
         onPressed: (){  print(widget.AnsKey); 
-         Navigator.push( context,MaterialPageRoute(builder: (context) =>ScanResult(image: _image, posMarks: widget.posMarks, negMarks: widget.negMarks, AnsKey:widget.AnsKey, totalmcq: widget.totalmcq, totalquestions: widget.totalquestions,)),);
+         Navigator.push( context,MaterialPageRoute(builder: (context) =>ScanResult(image: _image, posMarks: widget.posMarks, negMarks: widget.negMarks, AnsKey:widget.AnsKey, totalmcq: widget.totalmcq, totalquestions: widget.totalquestions, totalColumns: widget.totalColumns,)),);
           }, 
         style:ElevatedButton.styleFrom(backgroundColor: Colors.blue[900],foregroundColor: Colors.white),
         child: const Text("Check OMR Sheet",)),

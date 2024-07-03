@@ -2,19 +2,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:motion_tab_bar/MotionTabBar.dart';
 import 'package:motion_tab_bar/MotionTabBarController.dart';
-import 'package:omr_reader/GenSheetUIOptional/GenSheet.dart';
-import 'package:omr_reader/checkSheet/pickimage.dart';
-import 'package:omr_reader/home.dart';
+import 'package:omr_reader/Home/home.dart';
+import 'package:omr_reader/widget/SavedExams.dart';
+import 'package:omr_reader/widget/profile.dart';
+import 'package:omr_reader/widget/settings.dart';
 
 
-class animation extends StatefulWidget {
-  const animation({Key? key}) : super(key: key);
+class footer extends StatefulWidget {
+  const footer({Key? key}) : super(key: key);
 
   @override
-  State<animation> createState() => _animationState();
+  State<footer> createState() => _footerState();
 }
 
-class _animationState extends State<animation> with TickerProviderStateMixin {
+class _footerState extends State<footer> with TickerProviderStateMixin {
   MotionTabBarController? _motionTabBarController;
 
   @override
@@ -40,8 +41,8 @@ class _animationState extends State<animation> with TickerProviderStateMixin {
       bottomNavigationBar: MotionTabBar(
         controller: _motionTabBarController,
         initialSelectedTab: "Home",
-        labels: const ["Home","Dashboard",  "Profile", "Settings"],
-        icons: const [Icons.home,Icons.dashboard,  Icons.people_alt, Icons.settings],
+        labels: const ["Home","Performance ",  "Profile", "Settings"],
+        icons: const [Icons.home,Icons.bar_chart,  Icons.people_alt, Icons.settings],
         tabSize: 50,
         tabBarHeight: 55,
         textStyle: const TextStyle(
@@ -68,9 +69,9 @@ class _animationState extends State<animation> with TickerProviderStateMixin {
         controller: _motionTabBarController,
         children: <Widget>[
           home(),
-          GenSheet(),
-          GenSheet(),
-         GenSheet()
+          SavedExams(),
+          ProfilePage(),
+          SettingsPage()
         ],
       ),
     );
